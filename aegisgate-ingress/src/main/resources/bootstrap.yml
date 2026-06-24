@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      token: myroot
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        default-context: aegisgate

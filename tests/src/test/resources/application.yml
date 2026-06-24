@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: aegisgate-tests
+  
+  threads:
+    virtual:
+      enabled: true
+
+  # Kafka Configuration
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: aegisgate-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.zyrconpay.aegisgate.common.dto"
+
+  # Disable Vault
+  cloud:
+    vault:
+      enabled: false

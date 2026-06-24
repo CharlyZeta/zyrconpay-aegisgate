@@ -1,0 +1,16 @@
+target/
+**/target/
+*.class
+**/classes/
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+.metadata/
+bin/
+tmp/
+*.log
+.docker-java.properties
+.DS_Store
+Thumbs.db
