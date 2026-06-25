@@ -10,6 +10,18 @@ spring:
     virtual:
       enabled: true
 
+  # Vault Configuration
+  cloud:
+    vault:
+      enabled: true
+      uri: http://localhost:8200
+      token: myroot
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        default-context: aegisgate
+
   # Kafka Configuration
   kafka:
     bootstrap-servers: localhost:9092

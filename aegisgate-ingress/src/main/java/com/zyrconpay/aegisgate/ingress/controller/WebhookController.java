@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/gateways/payway/webhooks")
 public class WebhookController {

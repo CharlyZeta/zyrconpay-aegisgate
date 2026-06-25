@@ -1,15 +1,14 @@
 package com.zyrconpay.aegisgate.orchestrator.controller;
 
 import com.zyrconpay.aegisgate.common.dto.VerificationEventSet;
+import com.zyrconpay.aegisgate.common.exception.AegisGateException;
 import com.zyrconpay.aegisgate.orchestrator.service.RedisStateService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/payments")
 public class TransactionQueryController {
@@ -29,6 +28,23 @@ public class TransactionQueryController {
                 "hasPaymentIntent", state.hasPaymentIntent(),
                 "hasWebhookReceived", state.hasWebhookReceived(),
                 "status", state.status()
+        ));
+    }
+
+    @PostMapping("/{transactionId}/authorize")
+    public ResponseEntity<Map<String, Object>> authorize(@PathVariable String transactionId) {
+        redisStateService.verifyAuthorization(transactionId);
+        return ResponseEntity.ok(Map.of(
+                "status", "AUTHORIZED",
+                "message", "Transaction successfully verified and token consumed."
+        ));
+    }
+
+    @ExceptionHandler(AegisGateException.class)
+    public ResponseEntity<Map<String, Object>> handleAegisGateException(AegisGateException ex) {
+        return ResponseEntity.status(ex.getStatus()).body(Map.of(
+                "errorCode", ex.getErrorCode(),
+                "message", ex.getMessage()
         ));
     }
 }
