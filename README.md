@@ -260,3 +260,24 @@ Para ejecutar las pruebas automatizadas del sistema, incluyendo los tests de Tes
 # Corre todos los tests automatizados del proyecto
 mvn test
 ```
+
+---
+
+## 🖥️ Interfaz de Pruebas: AegisGate Checkout Sandbox UI
+
+Para facilitar la interacción y el testing de este motor asíncrono, se incluye una interfaz Sandbox interactiva desarrollada en React (dentro del módulo `aegisgate-sandbox-ui`). Esta UI simula la tienda online y calcula firmas HMAC-SHA256 en tiempo real en el navegador usando la Web Crypto API.
+
+### Galería de la Interfaz en Acción
+
+#### 1. Estado Inicial del Panel (Carga de credenciales persistidas)
+![1. Estado Inicial](aegisgate-sandbox-ui/docs/images/initial_state.png)
+
+#### 2. Checkout Intent Registrado (Estado PENDING con el intent consolidado en Redis)
+![2. Intención Registrada](aegisgate-sandbox-ui/docs/images/intent_registered.png)
+
+#### 3. Transacción Autorizada y Token Consumido (Retorno: AUTHORIZED)
+![3. Autorización Completada](aegisgate-sandbox-ui/docs/images/authorization_success.png)
+
+#### 4. Simulación Completa End-to-End Animada
+![4. Grabación del Proceso E2E](aegisgate-sandbox-ui/docs/images/e2e_recording.webp)
+

@@ -158,3 +158,22 @@ Para probar la robustez del sistema y la consolidación de estados:
    * *Estado*: En un plazo máximo de 2 segundos, el monitor detectará la convergencia, actualizando el estado de la transacción a `CONVERGED_VERIFIED` y marcando la etapa como `3DS Verified`.
 4. **Verificación y Captura**: Haz clic en **Verify & Consume Checkout Charge** (el cual se ha habilitado automáticamente).
    * *Consola*: Retorna `200 OK` con código `AUTHORIZED`, confirmando que el orquestador validó los tokens en Redis y consumió la clave de la transacción, mitigando vulnerabilidades de replay y bypass.
+
+---
+
+## 📸 Galería del Simulador
+
+A continuación se muestra el proceso de simulación visual paso a paso de extremo a extremo:
+
+### 1. Estado Inicial (Carga y Credenciales de LocalStorage)
+![1. Estado Inicial](docs/images/initial_state.png)
+
+### 2. Intención de Pago Registrada (Estado PENDING en el monitor de convergencia)
+![2. Intención Registrada](docs/images/intent_registered.png)
+
+### 3. Captura y Autorización Completada (Código de retorno: AUTHORIZED y consumo de token)
+![3. Autorización Completada](docs/images/authorization_success.png)
+
+### 4. Simulación Dinámica E2E Completa
+![4. Grabación del Proceso E2E](docs/images/e2e_recording.webp)
+
