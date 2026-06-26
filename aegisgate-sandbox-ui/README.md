@@ -128,10 +128,13 @@ Abre dos terminales de tu sistema y arranca las aplicaciones de AegisGate:
   ```bash
   mvn -pl aegisgate-ingress spring-boot:run "-Dspring-boot.run.arguments=--spring.profiles.active=dev" "-Dspotless.check.skip=true" "-Dspotless.skip=true"
   ```
+  *(Opcional) Explora y prueba su API interactiva en: [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)*
+
 * **Terminal 2: State Orchestrator (Puerto 8082)**
   ```bash
   mvn -pl aegisgate-orchestrator spring-boot:run "-Dspring-boot.run.arguments=--spring.profiles.active=dev" "-Dspotless.check.skip=true" "-Dspotless.skip=true"
   ```
+  *(Opcional) Explora y prueba su API interactiva en: [http://localhost:8082/swagger-ui.html](http://localhost:8082/swagger-ui.html)*
 
 ### Paso 4: Levantar la Interfaz React (Puerto 8080)
 Navega al directorio del frontend, instala las dependencias e inicia el servidor de desarrollo de Vite:

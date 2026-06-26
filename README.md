@@ -135,6 +135,21 @@ mvn -pl aegisgate-orchestrator spring-boot:run
 
 ---
 
+## 📖 Documentación Interactiva de la API (Swagger UI & OpenAPI)
+
+AegisGate incluye integración con **Springdoc OpenAPI** para generar documentación interactiva y permitir pruebas directamente desde el navegador:
+
+* **Ingress Gateway (Puerto 8081)**:
+  * **Swagger UI**: [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+  * **Especificación OpenAPI (JSON)**: [http://localhost:8081/v3/api-docs](http://localhost:8081/v3/api-docs)
+* **State Orchestrator (Puerto 8082)**:
+  * **Swagger UI**: [http://localhost:8082/swagger-ui.html](http://localhost:8082/swagger-ui.html)
+  * **Especificación OpenAPI (JSON)**: [http://localhost:8082/v3/api-docs](http://localhost:8082/v3/api-docs)
+
+Ambos servicios exponen sus rutas y DTOs correspondientes para que puedas probar las peticiones directamente y explorar la estructura de datos.
+
+---
+
 ## 🧪 Escenarios de Pruebas Manuales (Validación E2E)
 
 Abre otra terminal para realizar las pruebas utilizando `curl` contra los servicios locales activos.

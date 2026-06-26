@@ -4,6 +4,11 @@ import com.zyrconpay.aegisgate.common.cache.MerchantProfileCache;
 import com.zyrconpay.aegisgate.common.dto.PaymentEvents.WebhookReceivedEvent;
 import com.zyrconpay.aegisgate.common.event.EventPublisher;
 import com.zyrconpay.aegisgate.ingress.service.SignatureValidationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +21,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/gateways/payway/webhooks")
+@Tag(name = "Webhooks", description = "Endpoints para la recepción de callbacks/webhooks asíncronos desde Payway")
 public class WebhookController {
 
     private final EventPublisher eventPublisher;
@@ -45,9 +51,22 @@ public class WebhookController {
     ) {}
 
     @PostMapping
+    @Operation(
+            summary = "Procesar Webhook de Payway",
+            description = "Recibe notificaciones asíncronas de Payway con el estado de autenticación 3DS. Valida la firma HMAC-SHA256 en la cabecera `X-Payway-Signature` con la clave secreta del comercio obtenida desde HashiCorp Vault. Si es válida, publica el evento 3DS_WEBHOOK_RECEIVED en Kafka."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Webhook recibido, verificado criptográficamente y encolado correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autorizado: firma HMAC inválida, cabeceras ausentes, o comercio no registrado"),
+            @ApiResponse(responseCode = "400", description = "Carga útil malformada o faltan campos obligatorios")
+    })
     public Mono<ResponseEntity<Void>> handleWebhook(
-            @RequestHeader(value = "X-Merchant-ID", required = false) String merchantId,
-            @RequestHeader(value = "X-Payway-Signature", required = false) String signature,
+            @RequestHeader(value = "X-Merchant-ID", required = false)
+            @Parameter(description = "Identificador único del comercio (Merchant)", example = "default-merchant")
+            String merchantId,
+            @RequestHeader(value = "X-Payway-Signature", required = false)
+            @Parameter(description = "Firma criptográfica HMAC-SHA256 del cuerpo del mensaje calculada usando la clave secreta (signingKey) del comercio", example = "a5940428d085954a782b535d46114b7891104e768e1a123e42d7658ba3135bf7")
+            String signature,
             @RequestBody String rawBody
     ) {
         return Mono.defer(() -> {
