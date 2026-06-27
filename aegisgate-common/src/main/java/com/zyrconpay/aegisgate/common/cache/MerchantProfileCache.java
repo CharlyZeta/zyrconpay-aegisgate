@@ -1,7 +1,7 @@
 package com.zyrconpay.aegisgate.common.cache;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.zyrconpay.aegisgate.common.service.VaultMerchantCredentialService;
 import org.springframework.stereotype.Component;
 
@@ -12,16 +12,17 @@ import java.util.concurrent.TimeUnit;
 public class MerchantProfileCache {
 
     private final VaultMerchantCredentialService credentialService;
-    private final Cache<String, Map<String, String>> cache;
+    private final LoadingCache<String, Map<String, String>> cache;
 
     public MerchantProfileCache(VaultMerchantCredentialService credentialService) {
         this.credentialService = credentialService;
         
-        // Encrypted local cache simulated using JVM scoped cache builder with short-lived TTL
+        // Local cache utilizing refreshAfterWrite for non-blocking asynchronous refreshes
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(300, TimeUnit.SECONDS)
+                .refreshAfterWrite(240, TimeUnit.SECONDS)
                 .maximumSize(500)
-                .build();
+                .build(credentialService::getMerchantCredentials);
     }
 
     /**
@@ -31,7 +32,7 @@ public class MerchantProfileCache {
      * @return the credential values map
      */
     public Map<String, String> getCredentials(String merchantId) {
-        return cache.get(merchantId, credentialService::getMerchantCredentials);
+        return cache.get(merchantId);
     }
 
     /**

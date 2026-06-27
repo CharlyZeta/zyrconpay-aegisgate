@@ -15,9 +15,11 @@ public class RedisStateService {
 
     private final StringRedisTemplate redisTemplate;
     private final RedisScript<Long> convergenceScript;
+    private final TransactionStateRegistry stateRegistry;
 
-    public RedisStateService(StringRedisTemplate redisTemplate) {
+    public RedisStateService(StringRedisTemplate redisTemplate, TransactionStateRegistry stateRegistry) {
         this.redisTemplate = redisTemplate;
+        this.stateRegistry = stateRegistry;
         
         // Load Lua script from resources
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
@@ -35,29 +37,35 @@ public class RedisStateService {
      * @return the current VerificationEventSet state
      */
     public VerificationEventSet addToken(String transactionId, String token, int ttlSeconds) {
-        String key = "payment:3ds:events:" + transactionId;
+        String key = "payment:3ds:events:{" + transactionId + "}";
         List<String> keys = Collections.singletonList(key);
         
         // Execute converge.lua
         Long result = redisTemplate.execute(convergenceScript, keys, token, String.valueOf(ttlSeconds));
         
+        VerificationEventSet state;
         if (result != null && result == 1L) {
-            return new VerificationEventSet(transactionId, true, true, "CONVERGED_VERIFIED");
+            state = new VerificationEventSet(transactionId, true, true, "CONVERGED_VERIFIED");
         } else if (result != null && result == 2L) {
-            return new VerificationEventSet(transactionId, true, true, "CONVERGED_FAILED");
+            state = new VerificationEventSet(transactionId, true, true, "CONVERGED_FAILED");
         } else {
             // Not converged yet: query the set to see which token is present
             Boolean hasIntent = redisTemplate.opsForSet().isMember(key, "PAYMENT_INTENT_CREATED");
             Boolean hasSuccess = redisTemplate.opsForSet().isMember(key, "3DS_WEBHOOK_RECEIVED:SUCCESS");
             Boolean hasFailed = redisTemplate.opsForSet().isMember(key, "3DS_WEBHOOK_RECEIVED:FAILED");
             
-            return new VerificationEventSet(
+            state = new VerificationEventSet(
                     transactionId,
                     Boolean.TRUE.equals(hasIntent),
                     Boolean.TRUE.equals(hasSuccess) || Boolean.TRUE.equals(hasFailed),
                     "PENDING"
             );
         }
+
+        // Emit state to registry for real-time subscribers
+        stateRegistry.emit(transactionId, state);
+        
+        return state;
     }
 
     /**
@@ -67,7 +75,7 @@ public class RedisStateService {
      * @return the VerificationEventSet state
      */
     public VerificationEventSet getState(String transactionId) {
-        String key = "payment:3ds:events:" + transactionId;
+        String key = "payment:3ds:events:{" + transactionId + "}";
         Boolean hasIntent = redisTemplate.opsForSet().isMember(key, "PAYMENT_INTENT_CREATED");
         Boolean hasSuccess = redisTemplate.opsForSet().isMember(key, "3DS_WEBHOOK_RECEIVED:SUCCESS");
         Boolean hasFailed = redisTemplate.opsForSet().isMember(key, "3DS_WEBHOOK_RECEIVED:FAILED");
@@ -93,7 +101,7 @@ public class RedisStateService {
      * @param transactionId the unique transaction identifier
      */
     public void verifyAuthorization(String transactionId) {
-        String key = "payment:3ds:events:" + transactionId;
+        String key = "payment:3ds:events:{" + transactionId + "}";
         List<String> keys = java.util.Collections.singletonList(key);
         Long result = redisTemplate.execute(convergenceScript, keys, "AUTHORIZE_CHECK", "600");
         if (result != null && result == -1L) {

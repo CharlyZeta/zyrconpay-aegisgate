@@ -241,28 +241,72 @@ export default function App() {
     }
   };
 
-  // Status Polling logic
+  const sseRef = useRef<EventSource | null>(null);
+
+  // Status Polling & SSE Stream logic
   const startStatusPolling = (idToPoll: string) => {
-    if (pollingTimerRef.current) clearInterval(pollingTimerRef.current);
+    stopStatusPolling();
     
     setIsPolling(true);
-    addLog('info', `Started state monitor polling (2s interval)...`);
+    addLog('info', `[SSE] Initiating real-time state monitor stream...`);
     
-    // Initial fetch
+    try {
+      const url = `${config.orchestratorUrl}/api/v1/payments/${idToPoll}/status-stream`;
+      const eventSource = new EventSource(url);
+      sseRef.current = eventSource;
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data: TxStatus = JSON.parse(event.data);
+          setStatus(data);
+          addLog('muted', `[SSE] State update: status=${data.status}, intent=${data.hasPaymentIntent}, webhook=${data.hasWebhookReceived}`);
+          
+          if (data.status === 'CONVERGED_VERIFIED') {
+            setActiveStep(2);
+            addLog('info', '[SSE] Transaction successfully converged to VERIFIED. Closing stream.');
+            stopStatusPolling();
+          } else if (data.status === 'CONVERGED_FAILED') {
+            setActiveStep(2);
+            addLog('info', '[SSE] Transaction converged to FAILED. Closing stream.');
+            stopStatusPolling();
+          }
+        } catch (e: any) {
+          addLog('error', `[SSE] Error parsing event data: ${e.message}`);
+        }
+      };
+      
+      eventSource.onerror = () => {
+        addLog('warn', `[SSE] Stream connection failed or blocked. Falling back to HTTP Polling...`);
+        eventSource.close();
+        sseRef.current = null;
+        
+        startFallbackInterval(idToPoll);
+      };
+    } catch (err: any) {
+      addLog('warn', `[SSE] Failed to initialize EventSource: ${err.message}. Falling back to HTTP Polling...`);
+      startFallbackInterval(idToPoll);
+    }
+  };
+
+  const startFallbackInterval = (idToPoll: string) => {
+    if (pollingTimerRef.current) clearInterval(pollingTimerRef.current);
     fetchStatus(idToPoll);
-    
     pollingTimerRef.current = setInterval(() => {
       fetchStatus(idToPoll);
     }, 2000);
   };
 
   const stopStatusPolling = () => {
+    if (sseRef.current) {
+      sseRef.current.close();
+      sseRef.current = null;
+    }
     if (pollingTimerRef.current) {
       clearInterval(pollingTimerRef.current);
       pollingTimerRef.current = null;
     }
     setIsPolling(false);
-    addLog('info', 'State monitor polling stopped.');
+    addLog('info', 'State monitor connection closed.');
   };
 
   const fetchStatus = async (idToPoll: string) => {
@@ -271,20 +315,17 @@ export default function App() {
       if (res.ok) {
         const data: TxStatus = await res.json();
         setStatus(data);
+        addLog('muted', `[Poll] State query: status=${data.status}, intent=${data.hasPaymentIntent}, webhook=${data.hasWebhookReceived}`);
         
-        addLog('muted', `State query: status=${data.status}, intent=${data.hasPaymentIntent}, webhook=${data.hasWebhookReceived}`);
-        
-        // Update steps accordingly
-        if (data.status === 'CONVERGED_VERIFIED') {
+        if (data.status === 'CONVERGED_VERIFIED' || data.status === 'CONVERGED_FAILED') {
           setActiveStep(2);
-        } else if (data.status === 'CONVERGED_FAILED') {
-          setActiveStep(2);
+          stopStatusPolling();
         }
       } else {
-        addLog('warn', `State query returned non-200 status: ${res.status}`);
+        addLog('warn', `[Poll] State query returned status: ${res.status}`);
       }
     } catch (err: any) {
-      addLog('error', `Error polling Orchestrator status API: ${err.message}`);
+      addLog('error', `[Poll] Error querying status: ${err.message}`);
       stopStatusPolling();
     }
   };
@@ -319,9 +360,10 @@ export default function App() {
     }
   };
 
-  // Cleanup polling on unmount
+  // Cleanup connections on unmount
   useEffect(() => {
     return () => {
+      if (sseRef.current) sseRef.current.close();
       if (pollingTimerRef.current) clearInterval(pollingTimerRef.current);
     };
   }, []);

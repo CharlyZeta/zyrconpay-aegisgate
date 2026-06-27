@@ -22,20 +22,14 @@ public class TransactionEventConsumer {
     @KafkaListener(topics = "payment-intents", groupId = "aegisgate-group")
     public void consumeIntent(PaymentIntentEvent event) {
         log.info("Consuming payment intent event for transaction: {}", event.transactionId());
-        // Run execution within Virtual Thread context (virtual threads enabled globally via properties)
-        Thread.startVirtualThread(() -> {
-            redisStateService.addToken(event.transactionId(), "PAYMENT_INTENT_CREATED", 600);
-        });
+        redisStateService.addToken(event.transactionId(), "PAYMENT_INTENT_CREATED", 600);
     }
 
     @KafkaListener(topics = "payment-webhooks", groupId = "aegisgate-group")
     public void consumeWebhook(WebhookReceivedEvent event) {
         log.info("Consuming webhook received event for transaction: {}", event.transactionId());
-        // Run execution within Virtual Thread context (virtual threads enabled globally via properties)
-        Thread.startVirtualThread(() -> {
-            String token = "SUCCESS".equalsIgnoreCase(event.status3ds()) ? 
-                           "3DS_WEBHOOK_RECEIVED:SUCCESS" : "3DS_WEBHOOK_RECEIVED:FAILED";
-            redisStateService.addToken(event.transactionId(), token, 600);
-        });
+        String token = "SUCCESS".equalsIgnoreCase(event.status3ds()) ? 
+                       "3DS_WEBHOOK_RECEIVED:SUCCESS" : "3DS_WEBHOOK_RECEIVED:FAILED";
+        redisStateService.addToken(event.transactionId(), token, 600);
     }
 }

@@ -91,16 +91,19 @@ public class US1_TransactionFlowTest {
         );
         assertThat(webhookResponse.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
 
-        // 3. Verify status converges to verified (give some time for Kafka processing if needed, though Testcontainers/Kafka usually handles it fast)
-        try { Thread.sleep(1000); } catch (InterruptedException e) {}
-        
-        ResponseEntity<Map> statusResponse = restTemplate.getForEntity(
-                "/api/v1/payments/" + transactionId + "/status", 
-                Map.class
-        );
-        assertThat(statusResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(statusResponse.getBody()).isNotNull();
-        assertThat(statusResponse.getBody().get("status")).isEqualTo("CONVERGED_VERIFIED");
+        // 3. Verify status converges to verified
+        org.awaitility.Awaitility.await()
+                .atMost(java.time.Duration.ofSeconds(15))
+                .pollInterval(java.time.Duration.ofMillis(100))
+                .untilAsserted(() -> {
+                    ResponseEntity<Map> statusResponse = restTemplate.getForEntity(
+                            "/api/v1/payments/" + transactionId + "/status", 
+                            Map.class
+                    );
+                    assertThat(statusResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    assertThat(statusResponse.getBody()).isNotNull();
+                    assertThat(statusResponse.getBody().get("status")).isEqualTo("CONVERGED_VERIFIED");
+                });
     }
 
     @Test
@@ -143,14 +146,17 @@ public class US1_TransactionFlowTest {
         assertThat(intentResponse.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
 
         // 3. Verify status converges successfully
-        try { Thread.sleep(1000); } catch (InterruptedException e) {}
-
-        ResponseEntity<Map> statusResponse = restTemplate.getForEntity(
-                "/api/v1/payments/" + transactionId + "/status", 
-                Map.class
-        );
-        assertThat(statusResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(statusResponse.getBody()).isNotNull();
-        assertThat(statusResponse.getBody().get("status")).isEqualTo("CONVERGED_VERIFIED");
+        org.awaitility.Awaitility.await()
+                .atMost(java.time.Duration.ofSeconds(15))
+                .pollInterval(java.time.Duration.ofMillis(100))
+                .untilAsserted(() -> {
+                    ResponseEntity<Map> statusResponse = restTemplate.getForEntity(
+                            "/api/v1/payments/" + transactionId + "/status", 
+                            Map.class
+                    );
+                    assertThat(statusResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    assertThat(statusResponse.getBody()).isNotNull();
+                    assertThat(statusResponse.getBody().get("status")).isEqualTo("CONVERGED_VERIFIED");
+                });
     }
 }
