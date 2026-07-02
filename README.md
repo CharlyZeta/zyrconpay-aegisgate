@@ -4,6 +4,17 @@ AegisGate es un motor de verificación de transacciones 3D Secure (3DS) altament
 
 ---
 
+## 🧠 Filosofía de Diseño: ¿Por qué solo 3DS? (No es una pasarela común)
+
+AegisGate **no es una pasarela de pagos tradicional** (no gestiona capturas de tarjetas directas, cobros recurrentes ni autorizaciones simples). Es un **motor especializado de orquestación, validación criptográfica y convergencia de estado para desafíos 3D Secure (3DS)**.
+
+El aislamiento absoluto del flujo 3DS de los flujos de pago directo convencionales se fundamenta en:
+
+1.  **Protección Absoluta contra Bypass**: Al desacoplar la validación 3DS del flujo de cobro primario y requerir de forma atómica la presencia de los dos tokens (`INTENT` + `WEBHOOK:SUCCESS`) a nivel de base de datos en memoria (Redis), se anula por completo la posibilidad de que un atacante "salte" la validación bancaria inyectando respuestas de éxito simuladas.
+2.  **Reducción del Alcance (Scope) de PCI-DSS**: El procesamiento y verificación de desafíos de autenticación 3DS implican requerimientos de seguridad y auditoría rigurosos. Aislar esta lógica en AegisGate permite que el resto del ecosistema de pagos de la plataforma permanezca fuera de este alcance crítico de auditoría, reduciendo costos y simplificando el cumplimiento normativo.
+
+---
+
 ## 📊 Arquitectura y Diagramas de Secuencia
 
 Para comprender el flujo y el comportamiento asincrónico del sistema, a continuación se detallan los diagramas de funcionamiento y seguridad:
@@ -67,6 +78,52 @@ graph TD
     G -- No (Falta alguno) --> I[Retorna -1 / Lanzar SecurityBypassException]
     I --> J[HTTP 403 Forbidden <br/> Bloqueo de Transacción]
 ```
+
+### 3. Arquitectura de Despliegue Físico y Seguridad de Red
+El despliegue en entornos productivos exige una separación estricta de red por zonas para mitigar vectores de ataque hacia el orquestador y los almacenes de datos:
+
+```mermaid
+graph TD
+    subgraph DMZ [Zona Desmilitarizada - Acceso Público]
+        LB["Load Balancer / WAF"]
+        Ingress["AegisGate Ingress Gateway (Spring WebFlux)"]
+    end
+
+    subgraph PrivateSubnet [Subred Privada - Aislada de Internet]
+        Orch["AegisGate Orchestrator (Virtual Threads)"]
+        Kafka[("Apache Kafka (Message Bus)")]
+        Redis[("Redis Cluster (State Store)")]
+        Vault[("HashiCorp Vault (Secrets Store)")]
+    end
+
+    Internet["Internet / Clientes y Payway"] --> LB
+    LB --> Ingress
+    Ingress -- "1. Encolar Eventos" --> Kafka
+    Ingress -- "2. Recuperar Llaves HMAC" --> Vault
+    Kafka -- "3. Consumir Asíncrono" --> Orch
+    Orch -- "4. Verificar Convergencia" --> Redis
+```
+
+*   **Ingress Gateway (DMZ)**: Único componente expuesto públicamente. Al ser completamente stateless y carecer de conexión directa a bases de datos relacionales, una vulnerabilidad en este nodo no compromete datos persistentes del negocio.
+*   **State Orchestrator & Almacenes (Subred Privada)**: Totalmente aislados del exterior. La comunicación se realiza de forma desacoplada y asíncrona a través del bus de eventos de Kafka.
+
+---
+
+## 📊 Monitoreo y Observabilidad (Production-Ready)
+Ambos microservicios exponen telemetría de producción mediante **Spring Boot Actuator** y **Micrometer Prometheus**.
+
+### Endpoints de Monitoreo
+*   **Ingress Gateway (Puerto 8081)**:
+    *   **Health Check & Probes**: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
+    *   **Métricas Prometheus**: [http://localhost:8081/actuator/prometheus](http://localhost:8081/actuator/prometheus)
+*   **State Orchestrator (Puerto 8082)**:
+    *   **Health Check & Probes**: [http://localhost:8082/actuator/health](http://localhost:8082/actuator/health)
+    *   **Métricas Prometheus**: [http://localhost:8082/actuator/prometheus](http://localhost:8082/actuator/prometheus)
+
+### Indicadores Clave de Rendimiento (SLIs)
+1.  `http_server_requests_seconds`: Monitoreo del percentil 99 (p99) de latencia para certificar que el gateway responde en menos de 10ms (SC-001).
+2.  `jvm_threads_live_threads`: Vigilancia de hilos nativos activos y portadores de hilos virtuales de Java 21.
+3.  `aegisgate.security.bypass.attempts` (Excepciones): Alarmas automáticas ante bloqueos de transacciones por tokens ausentes en Redis.
 
 ---
 
