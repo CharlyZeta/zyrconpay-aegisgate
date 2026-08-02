@@ -140,7 +140,7 @@ graph TD
     E --> F[Ejecución de Script Atómico converge.lua en Redis]
 
     G[Intento de Autorización / Captura / POST authorize] --> H[EVAL converge.lua ARGV: AUTHORIZE_CHECK]
-    H --> I{SISMEMBER Set payment:3ds:events:{txId}}
+    H --> I{"¿SISMEMBER Set payment:3ds:events:{txId}?"}
     I -- "Están PAYMENT_INTENT_CREATED + 3DS_WEBHOOK_RECEIVED:SUCCESS" --> J[ELIMINAR Key de Redis <br/> Estado: AUTHORIZED <br/> HTTP 200 OK]
     I -- "Falta alguno de los dos tokens" --> K[Retorna -1: SecurityBypassException <br/> HTTP 403 Forbidden]
     I -- "Webhook reportó 3DS_WEBHOOK_RECEIVED:FAILED" --> L[Retorna -2: SecurityBypassException <br/> Rechazado por Banco Emisor]
