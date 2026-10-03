@@ -9,25 +9,38 @@
 [![ArchUnit Isolation](https://img.shields.io/badge/ArchUnit-Boundary%20Enforced-informational.svg?style=for-the-badge)](https://www.archunit.org/)
 [![React 18 Sandbox](https://img.shields.io/badge/Sandbox-React%2018%20%2B%20SSE-61DAFB.svg?style=for-the-badge&logo=react)](aegisgate-sandbox-ui)
 
+![AegisGate 3DS Engine Hero Banner](docs/images/aegisgate_hero_banner.jpg)
+
 **AegisGate** es un motor de verificación y convergencia de transacciones **3D Secure (3DS)** de grado de producción, diseñado bajo una arquitectura reactiva orientada a eventos (*Event Sourcing* en base de datos en memoria) utilizando **Java 21 (Virtual Threads)** y **Spring Boot**. 
 
 Su propósito central es reingenierizar y aislar el flujo de autenticación 3DS originalmente acoplado en monolitos (como plugins de WooCommerce/PHP), garantizando **protección absoluta contra ataques de bypass de seguridad**, resiliencia ante condiciones de carrera en webhooks asincrónicos, soporte multi-tenant dinámico y tiempos de respuesta en el borde menores a **10 ms (P99)**.
 
 ---
 
+## 📚 Manuales de Referencia Técnica Extendidos
+
+Para consultar la documentación técnica exhaustiva de grado de producción, accede a los manuales detallados en la carpeta [`docs/`](docs/):
+
+* 📐 **[Manual de Arquitectura y Diseño Distribuido (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md)**: Justificación profunda de Java 21 Virtual Threads, WebFlux Ingress, Apache Kafka KRaft, Redis Cluster Hashtags, Caffeine Cache y diagramas Mermaid completos.
+* 🛡️ **[Modelo de Amenazas y Seguridad (`docs/SECURITY_AND_THREAT_MODEL.md`)](docs/SECURITY_AND_THREAT_MODEL.md)**: Análisis STRIDE / OWASP, mitigación atómica de bypass con dual tokens, HMAC-SHA256 constant-time, integración con HashiCorp Vault, alcance PCI-DSS y pruebas ArchUnit.
+* 🔌 **[Guía de Integración API Paso a Paso (`docs/API_INTEGRATION_GUIDE.md`)](docs/API_INTEGRATION_GUIDE.md)**: Especificaciones OpenAPI de endpoints, peticiones `curl`, streaming SSE real-time, cálculo de firmas HMAC (Node.js, Python, Java, React) y matriz de códigos HTTP.
+
+---
+
 ## 📋 Tabla de Contenidos
-1. [🧠 Resumen Ejecutivo y Motivación de Negocio](#-resumen-ejecutivo-y-motivación-de-negocio)
-2. [🔒 Filosofía de Diseño: Aislamiento 3DS vs Pagos Directos](#-filosofía-de-diseño-aislamiento-3ds-vs-pagos-directos)
-3. [📊 Arquitectura y Diagramas Mermaid](#-arquitectura-y-diagramas-mermaid)
+1. [📚 Manuales de Referencia Técnica Extendidos](#-manuales-de-referencia-técnica-extendidos)
+2. [🧠 Resumen Ejecutivo y Motivación de Negocio](#-resumen-ejecutivo-y-motivación-de-negocio)
+3. [🔒 Filosofía de Diseño: Aislamiento 3DS vs Pagos Directos](#-filosofía-de-diseño-aislamiento-3ds-vs-pagos-directos)
+4. [📊 Arquitectura y Diagramas Mermaid](#-arquitectura-y-diagramas-mermaid)
    - [Diagrama de Secuencia 3D Secure (Happy Path & Late Binding)](#1-diagrama-de-secuencia-3d-secure-happy-path--late-binding)
    - [Diagrama de Flujo de Seguridad y Mitigación de Bypass](#2-diagrama-de-flujo-de-seguridad-y-mitigación-de-bypass)
    - [Topología Física y Seguridad de Red (DMZ vs Subred Privada)](#3-topología-física-y-seguridad-de-red-dmz-vs-subred-privada)
-4. [🧱 Desglose Módulo por Módulo y Decisiones Tecnológicas](#-desglose-módulo-por-módulo-y-decisiones-tecnológicas)
-5. [🛡️ Casos Borde (Edge Cases) y Manejo de Resiliencia](#-casos-borde-edge-cases-y-manejo-de-resiliencia)
-6. [🚀 Guía de Despliegue y Validación E2E (Curl & Swagger)](#-guía-de-despliegue-y-validación-e2e)
-7. [🧪 Cobertura de Pruebas y Métricas de Calidad](#-cobertura-de-pruebas-y-métricas-de-calidad)
-8. [🖥️ AegisGate Checkout Sandbox UI (React + SSE)](#️-aegisgate-checkout-sandbox-ui-react--sse)
-9. [📈 Observabilidad y Monitoreo de Producción](#-observabilidad-y-monitoreo-de-producción)
+5. [🧱 Desglose Módulo por Módulo y Decisiones Tecnológicas](#-desglose-módulo-por-módulo-y-decisiones-tecnológicas)
+6. [🛡️ Casos Borde (Edge Cases) y Manejo de Resiliencia](#-casos-borde-edge-cases-y-manejo-de-resiliencia)
+7. [🚀 Guía de Despliegue y Validación E2E (Curl & Swagger)](#-guía-de-despliegue-y-validación-e2e)
+8. [🧪 Cobertura de Pruebas y Métricas de Calidad](#-cobertura-de-pruebas-y-métricas-de-calidad)
+9. [🖥️ AegisGate Checkout Sandbox UI (React + SSE)](#️-aegisgate-checkout-sandbox-ui-react--sse)
+10. [📈 Observabilidad y Monitoreo de Producción](#-observabilidad-y-monitoreo-de-producción)
 
 ---
 
