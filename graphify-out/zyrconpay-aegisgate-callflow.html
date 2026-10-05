@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zyrconpay-aegisgate — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>zyrconpay-aegisgate — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 260 nodes, 455 edges, 20 communities. Commit: 0d8573a</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#extract-pipeline">Extraction Pipeline</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#tests-fixtures">Tests &amp; Fixtures</a>
+    <a href="#convergelua-aegisgate-orchestrator">Convergelua Aegisgate Orchestrator</a>
+    <a href="#viteconfigts-aegisgate-sandbox">Viteconfigts Aegisgate Sandbox</a>
+    <a href="#aegisgate-common-pomxml">Aegisgate Common Pomxml</a>
+    <a href="#aegisgate-ingress-pomxml">Aegisgate Ingress Pomxml</a>
+    <a href="#aegisgate-orchestrator-pomxml">Aegisgate Orchestrator Pomxml</a>
+    <a href="#comzyrconpayaegisgatezyrconpay-aegisgate-pomxml">Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    EXTRACT_PIPELINE_5F350230("Extraction Pipeline<br/><small>154 nodes</small>")
+    class EXTRACT_PIPELINE_5F350230 module;
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>95 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>5 nodes</small>")
+    class TESTS_FIXTURES_B84B1DCC module;
+    CONVERGELUA_AEGISGATE_ORCHESTRATOR_474043D8("Convergelua Aegisgate Orchestrator<br/><small>1 nodes</small>")
+    class CONVERGELUA_AEGISGATE_ORCHESTRATOR_474043D8 module;
+    VITECONFIGTS_AEGISGATE_SANDBOX_5DC375B8("Viteconfigts Aegisgate Sandbox<br/><small>1 nodes</small>")
+    class VITECONFIGTS_AEGISGATE_SANDBOX_5DC375B8 module;
+    AEGISGATE_COMMON_POMXML_1790EEE5("Aegisgate Common Pomxml<br/><small>1 nodes</small>")
+    class AEGISGATE_COMMON_POMXML_1790EEE5 module;
+    AEGISGATE_INGRESS_POMXML_EC395CBF("Aegisgate Ingress Pomxml<br/><small>1 nodes</small>")
+    class AEGISGATE_INGRESS_POMXML_EC395CBF module;
+    AEGISGATE_ORCHESTRATOR_POMXML_84D92D1F("Aegisgate Orchestrator Pomxml<br/><small>1 nodes</small>")
+    class AEGISGATE_ORCHESTRATOR_POMXML_84D92D1F module;
+    COMZYRCONPAYAEGISGATEZYRCONPAY_AEGISGATE_POMXML_15B0513B("Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml<br/><small>1 nodes</small>")
+    class COMZYRCONPAYAEGISGATEZYRCONPAY_AEGISGATE_POMXML_15B0513B module;
+    EXTRACT_PIPELINE_5F350230 -.-> BUILD_GRAPH_321CBB04
+    BUILD_GRAPH_321CBB04 -.-> TESTS_FIXTURES_B84B1DCC
+    TESTS_FIXTURES_B84B1DCC -.-> CONVERGELUA_AEGISGATE_ORCHESTRATOR_474043D8
+    CONVERGELUA_AEGISGATE_ORCHESTRATOR_474043D8 -.-> VITECONFIGTS_AEGISGATE_SANDBOX_5DC375B8
+    VITECONFIGTS_AEGISGATE_SANDBOX_5DC375B8 -.-> AEGISGATE_COMMON_POMXML_1790EEE5
+    AEGISGATE_COMMON_POMXML_1790EEE5 -.-> AEGISGATE_INGRESS_POMXML_EC395CBF
+    AEGISGATE_INGRESS_POMXML_EC395CBF -.-> AEGISGATE_ORCHESTRATOR_POMXML_84D92D1F
+    AEGISGATE_ORCHESTRATOR_POMXML_84D92D1F -.-> COMZYRCONPAYAEGISGATEZYRCONPAY_AEGISGATE_POMXML_15B0513B
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Extraction Pipeline</td><td>154</td><td><code>0, 1, 2, 7, 8, 9, 10</code></td></tr><tr><td>Graph Build</td><td>95</td><td><code>3, 4, 5, 6, 12</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>5</td><td><code>11, 19</code></td></tr><tr><td>Convergelua Aegisgate Orchestrator</td><td>1</td><td><code>13</code></td></tr><tr><td>Viteconfigts Aegisgate Sandbox</td><td>1</td><td><code>14</code></td></tr><tr><td>Aegisgate Common Pomxml</td><td>1</td><td><code>15</code></td></tr><tr><td>Aegisgate Ingress Pomxml</td><td>1</td><td><code>16</code></td></tr><tr><td>Aegisgate Orchestrator Pomxml</td><td>1</td><td><code>17</code></td></tr><tr><td>Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml</td><td>1</td><td><code>18</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Extraction Pipeline -&gt; Graph Build -&gt; Tests &amp; Fixtures -&gt; Convergelua Aegisgate Orchestrator -&gt; Viteconfigts Aegisgate Sandbox -&gt; Aegisgate Common Pomxml -&gt; Aegisgate Ingress Pomxml</div>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Extraction Pipeline ====== -->
+<h2 id="extract-pipeline">2. Extraction Pipeline</h2>
+<p>Extraction Pipeline groups implementation around aegisgate, com, zyrconpay, common, mostly in aegisgate/integration/US3_BypassPreventionTest.java, orchestrator/controller/TransactionQueryController.java, orchestrator/service/RedisStateService.java. This section covers 154 nodes and 357 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Extraction Pipeline (154 nodes, 357 edges)
+    subgraph extract_pipeline_common_cache_MerchantProfileCac_d3bb1e5f["common/cache/MerchantProfileCache.java"]
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee("MerchantProfileCache<br/><small>common/cache/MerchantProfileCache.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_8db76902("getCredentials()<br/><small>common/cache/MerchantProfileCache.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_47994512("invalidate()<br/><small>common/cache/MerchantProfileCache.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_9b0f3c17("MerchantProfileCache()<br/><small>common/cache/MerchantProfileCache.java</small>")
+    end
+    subgraph extract_pipeline_common_dto_PaymentEvents_java_f615928d["common/dto/PaymentEvents.java"]
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_a6bc69b4("PaymentEvents<br/><small>common/dto/PaymentEvents.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_6a38c652("PaymentEvents()<br/><small>common/dto/PaymentEvents.java</small>")
+    end
+    subgraph extract_pipeline_common_dto_VerificationEventSet_e646bc9a["common/dto/VerificationEventSet.java"]
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_e4673465("VerificationEventSet<br/><small>common/dto/VerificationEventSet.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_c5390474("isConverged()<br/><small>common/dto/VerificationEventSet.java</small>")
+    end
+    subgraph extract_pipeline_common_event_EventPublisher_jav_703b4f5b["common/event/EventPublisher.java"]
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_78317df8("EventPublisher<br/><small>common/event/EventPublisher.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_3977d573("publish()<br/><small>common/event/EventPublisher.java</small>")
+    end
+    subgraph extract_pipeline_common_event_KafkaEventPublishe_12ae96bd["common/event/KafkaEventPublisher.java"]
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_19515224("KafkaEventPublisher<br/><small>common/event/KafkaEventPublisher.java</small>")
+        aegisgate_common_src_main_java_com_zyrconpay_aeg_596d440a("KafkaEventPublisher()<br/><small>common/event/KafkaEventPublisher.java</small>")
+    end
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_00941210("US1_TransactionFlowTest.java")
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_3f0119f8("US2_MultiTenantSupportTest.java")
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_5505732b("US3_BypassPreventionTest.java")
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_83adf9b5("US4_PerformanceImprovementsTest.java")
+    aegisgate_ingress_src_main_java_com_zyrconpay_ae_2d63c90b("WebhookController.java")
+    aegisgate_orchestrator_src_main_java_com_zyrconp_e6046eaa("TransactionQueryController.java")
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_8db76902
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_47994512
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_9b0f3c17
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_a6bc69b4 -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_6a38c652
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_e4673465 -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_c5390474
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_78317df8 -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_3977d573
+    aegisgate_common_src_main_java_com_zyrconpay_aeg_19515224 -->|method| aegisgate_common_src_main_java_com_zyrconpay_aeg_596d440a
+    aegisgate_ingress_src_main_java_com_zyrconpay_ae_2d63c90b -->|imports| aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee
+    aegisgate_ingress_src_main_java_com_zyrconpay_ae_2d63c90b -->|imports| aegisgate_common_src_main_java_com_zyrconpay_aeg_78317df8
+    aegisgate_orchestrator_src_main_java_com_zyrconp_e6046eaa -->|imports| aegisgate_common_src_main_java_com_zyrconpay_aeg_e4673465
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_83adf9b5 -->|imports| aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee
+    tests_src_test_java_com_zyrconpay_aegisgate_inte_83adf9b5 -->|imports| aegisgate_common_src_main_java_com_zyrconpay_aeg_e4673465
+    %% Omitted for readability: 136 nodes, 0 edges
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_7ae493ee klass;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_8db76902 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_47994512 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_9b0f3c17 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_a6bc69b4 klass;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_6a38c652 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_e4673465 klass;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_c5390474 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_78317df8 klass;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_3977d573 function;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_19515224 klass;
+    class aegisgate_common_src_main_java_com_zyrconpay_aeg_596d440a function;
+    class tests_src_test_java_com_zyrconpay_aegisgate_inte_00941210 test;
+    class tests_src_test_java_com_zyrconpay_aegisgate_inte_3f0119f8 test;
+    class tests_src_test_java_com_zyrconpay_aegisgate_inte_5505732b test;
+    class tests_src_test_java_com_zyrconpay_aegisgate_inte_83adf9b5 test;
+    class aegisgate_ingress_src_main_java_com_zyrconpay_ae_2d63c90b ui;
+    class aegisgate_orchestrator_src_main_java_com_zyrconp_e6046eaa klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>.verifyAuthorization()</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>authorize()</code><br><small style="color:var(--muted)">orchestrator/controller/TransactionQueryController.java</small><br><code>RedisStateService</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small><br><code>testVerifyAuthorization_WithMissingTokens_ShouldThrowSecurityBypassException()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>.verifyAuthorization() node in orchestrator/service/RedisStateService.java.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>US1_TransactionFlowTest.java</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>org.junit.jupiter.api.Test</code><br><code>org.springframework.boot.test.context.S...</code><br><code>org.springframework.boot.test.web.clien...</code><br>+5 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>US1_TransactionFlowTest</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small><br><code>configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small><br><code>testHappyPath_IntentThenWebhook()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small><br>+1 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>.configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US1_TransactionFlowTest</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>.computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>testHappyPath_IntentThenWebhook()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small><br><code>testRaceCondition_WebhookArrivesBeforeIntent()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small><br><code>US1_TransactionFlowTest</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.computeSignature() node in aegisgate/integration/US1_TransactionFlowTest.java.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>.testHappyPath_IntentThenWebhook()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US1_TransactionFlowTest</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>.testRaceCondition_WebhookArrivesBeforeIntent()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US1_TransactionFlowTest</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US1_TransactionFlowTest.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>US2_MultiTenantSupportTest.java</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>org.junit.jupiter.api.Test</code><br><code>org.springframework.boot.test.context.S...</code><br><code>org.springframework.boot.test.web.clien...</code><br>+5 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>US2_MultiTenantSupportTest</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small><br><code>configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small><br><code>testMissingOrUnrecognizedMerchantHeader_ShouldReject()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small><br>+1 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>.configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US2_MultiTenantSupportTest</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>.computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>testValidMerchantRequest_RetrievesCorrectKeyFromVault()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small><br><code>US2_MultiTenantSupportTest</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.computeSignature() node in aegisgate/integration/US2_MultiTenantSupportTest.java.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>.testValidMerchantRequest_RetrievesCorrectKeyFromVault()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US2_MultiTenantSupportTest</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>.testMissingOrUnrecognizedMerchantHeader_ShouldReject()</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US2_MultiTenantSupportTest</code><br><small style="color:var(--muted)">aegisgate/integration/US2_MultiTenantSupportTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>US3_BypassPreventionTest.java</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>org.junit.jupiter.api.Test</code><br><code>org.springframework.boot.test.context.S...</code><br><code>org.springframework.boot.test.web.clien...</code><br>+7 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small><br><code>configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small><br><code>testDirectAuthorizationBypass_ShouldThrowSecurityBypassException()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small><br>+3 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>.configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>.computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>testDirectAuthorizationBypass_ShouldThrowSecurityBypassException()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small><br><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.computeSignature() node in aegisgate/integration/US3_BypassPreventionTest.java.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>.testWebhookSignatureTampered_ShouldReturn401()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>.testDirectAuthorizationBypass_ShouldThrowSecurityBypassException()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><code>computeSignature()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>.testVerifyAuthorization_WithMissingTokens_ShouldThrowSecurityBypassException()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><code>verifyAuthorization()</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>.testVerifyAuthorization_WithValidTokens_ShouldSucceedAndConsumeKey()</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US3_BypassPreventionTest</code><br><small style="color:var(--muted)">aegisgate/integration/US3_BypassPreventionTest.java</small></td>
+  <td><code>addToken()</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small><br><code>verifyAuthorization()</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>US4_PerformanceImprovementsTest.java</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>MerchantProfileCache</code><br><small style="color:var(--muted)">common/cache/MerchantProfileCache.java</small><br><code>org.junit.jupiter.api.Test</code><br><code>org.springframework.boot.test.context.S...</code><br>+10 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>US4_PerformanceImprovementsTest</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small><br><code>testCaffeineCacheLoading()</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small><br><code>testRedisKeysUseHashtags()</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small><br>+1 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>.configureProperties()</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US4 PerformanceImprovementsTest</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>.testRedisKeysUseHashtags()</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>US4 PerformanceImprovementsTest</code><br><small style="color:var(--muted)">aegisgate/integration/US4_PerformanceImprovementsTest.java</small></td>
+  <td><code>addToken()</code><br><small style="color:var(--muted)">orchestrator/service/RedisStateService.java</small></td>
+  <td>Caches analysis results or computes cache keys.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>AegisGateBoundaryTest.java</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>com.tngtech.archunit.core.domain.JavaCl...</code><br><code>org.junit.jupiter.api.Test</code></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>AegisGateBoundaryTest</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>testDirectPaymentIsolation()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small><br><code>testIngressDatabaseIsolation()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small><br><code>testModuleBoundaries()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>.testModuleBoundaries()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>AegisGateBoundaryTest</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>.testDirectPaymentIsolation()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>AegisGateBoundaryTest</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>.testIngressDatabaseIsolation()</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>AegisGateBoundaryTest</code><br><small style="color:var(--muted)">aegisgate/structural/AegisGateBoundaryTest.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate/integration/US3_BypassPreventionTest.java</code></td><td>8 nodes</td></tr>
+<tr><td><code>orchestrator/controller/TransactionQueryController.java</code></td><td>7 nodes</td></tr>
+<tr><td><code>ingress/controller/WebhookController.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>orchestrator/service/RedisStateService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aegisgate/integration/US1_TransactionFlowTest.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aegisgate/integration/US2_MultiTenantSupportTest.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aegisgate/integration/US4_PerformanceImprovementsTest.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>common/cache/MerchantProfileCache.java</code></td><td>5 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: references x144, imports x97, method x58, contains x28. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. Graph Build ====== -->
+<h2 id="build-graph">3. Graph Build</h2>
+<p>Graph Build groups implementation around aegisgate, sandbox, packagejson, tsconfigappjson, mostly in aegisgate-sandbox-ui/package.json, aegisgate-sandbox-ui/tsconfig.app.json, aegisgate-sandbox-ui/tsconfig.node.json. This section covers 95 nodes and 95 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (95 nodes, 95 edges)
+    subgraph build_graph_aegisgate_sandbox_ui_package_json_5e7644e7["aegisgate-sandbox-ui/package.json"]
+        aegisgate_sandbox_ui_package_dependencies_lucide_f7ea8501("lucide-react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_dependencies_react_c3a476b6("react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_dependencies_react_f524d044("react-dom<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_devdependencies_oxl_4947945b("oxlint<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        lucide_react_0d541e45("lucide-react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        react_6b810c90("react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        react_dom_1c239ab9("react-dom<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_devdependencies_typ_78545fa6("@types/node<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        types_node_eed9011c("@types/node<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_devdependencies_typ_9b09f721("@types/react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        types_react_cf3431a2("@types/react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_devdependencies_typ_708a8ad9("@types/react-dom<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        types_react_dom_c31b8d8e("@types/react-dom<br/><small>aegisgate-sandbox-ui/package.json</small>")
+        aegisgate_sandbox_ui_package_devdependencies_vit_b4fde8ef("@vitejs/plugin-react<br/><small>aegisgate-sandbox-ui/package.json</small>")
+    end
+    subgraph build_graph_aegisgate_sandbox_ui_src_App_tsx_195a93d8["aegisgate-sandbox-ui/src/App.tsx"]
+        aegisgate_sandbox_ui_src_app_app_fd090eed("App()<br/><small>aegisgate-sandbox-ui/src/App.tsx</small>")
+        aegisgate_sandbox_ui_src_app_uuidv4_1168e781("uuidv4()<br/><small>aegisgate-sandbox-ui/src/App.tsx</small>")
+        aegisgate_sandbox_ui_src_app_calculatehmacsha256_1efc9d4c("calculateHmacSha256()<br/><small>aegisgate-sandbox-ui/src/App.tsx</small>")
+    end
+    aegisgate_sandbox_ui_src_main_897b279f("main.tsx")
+    aegisgate_sandbox_ui_src_app_app_fd090eed -->|calls| aegisgate_sandbox_ui_src_app_uuidv4_1168e781
+    aegisgate_sandbox_ui_src_app_app_fd090eed -->|calls| aegisgate_sandbox_ui_src_app_calculatehmacsha256_1efc9d4c
+    aegisgate_sandbox_ui_package_dependencies_lucide_f7ea8501 -->|imports| lucide_react_0d541e45
+    aegisgate_sandbox_ui_package_dependencies_react_c3a476b6 -->|imports| react_6b810c90
+    aegisgate_sandbox_ui_package_dependencies_react_f524d044 -->|imports| react_dom_1c239ab9
+    aegisgate_sandbox_ui_package_devdependencies_typ_78545fa6 -->|imports| types_node_eed9011c
+    aegisgate_sandbox_ui_package_devdependencies_typ_9b09f721 -->|imports| types_react_cf3431a2
+    aegisgate_sandbox_ui_package_devdependencies_typ_708a8ad9 -->|imports| types_react_dom_c31b8d8e
+    aegisgate_sandbox_ui_src_main_897b279f -->|imports| aegisgate_sandbox_ui_src_app_app_fd090eed
+    %% Omitted for readability: 77 nodes, 0 edges
+    class aegisgate_sandbox_ui_package_dependencies_lucide_f7ea8501 function;
+    class aegisgate_sandbox_ui_package_dependencies_react_c3a476b6 function;
+    class aegisgate_sandbox_ui_package_dependencies_react_f524d044 function;
+    class aegisgate_sandbox_ui_package_devdependencies_oxl_4947945b function;
+    class lucide_react_0d541e45 function;
+    class react_6b810c90 function;
+    class react_dom_1c239ab9 function;
+    class aegisgate_sandbox_ui_package_devdependencies_typ_78545fa6 function;
+    class types_node_eed9011c function;
+    class aegisgate_sandbox_ui_package_devdependencies_typ_9b09f721 function;
+    class types_react_cf3431a2 function;
+    class aegisgate_sandbox_ui_package_devdependencies_typ_708a8ad9 function;
+    class types_react_dom_c31b8d8e function;
+    class aegisgate_sandbox_ui_package_devdependencies_vit_b4fde8ef function;
+    class aegisgate_sandbox_ui_src_app_app_fd090eed ui;
+    class aegisgate_sandbox_ui_src_app_uuidv4_1168e781 ui;
+    class aegisgate_sandbox_ui_src_app_calculatehmacsha256_1efc9d4c ui;
+    class aegisgate_sandbox_ui_src_main_897b279f ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>package.json</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>package.json node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>name</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>private</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>private node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>version</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>type</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>type node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>scripts</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>scripts node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>dev</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dev node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>build</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>lint</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>lint node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>preview</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>preview node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>dependencies</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dependencies node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>lucide-react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>lucide-react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>react-dom node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>react-dom node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>devDependencies</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>devDependencies node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>@types/node</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@types/node</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>@types/node node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>@types/node</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@types/node</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@types/node node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>@types/react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@types/react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>@types/react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>@types/react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@types/react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@types/react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>@types/react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@types/react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>@types/react-dom node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>@types/react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@types/react-dom</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@types/react-dom node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>@vitejs/plugin-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@vitejs/plugin-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>@vitejs/plugin-react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>@vitejs/plugin-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@vitejs/plugin-react</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@vitejs/plugin-react node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>oxlint</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>oxlint</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>oxlint node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>oxlint</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>oxlint</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>oxlint node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>vite</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>vite</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>vite node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>vite</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>vite</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>vite node in aegisgate-sandbox-ui/package.json.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate-sandbox-ui/package.json</code></td><td>32 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/tsconfig.app.json</code></td><td>23 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/tsconfig.node.json</code></td><td>20 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/.oxlintrc.json</code></td><td>9 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/src/App.tsx</code></td><td>7 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/tsconfig.json</code></td><td>3 nodes</td></tr>
+<tr><td><code>aegisgate-sandbox-ui/src/main.tsx</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x68, extends x11, imports x11, imports x3. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. Tests & Fixtures ====== -->
+<h2 id="tests-fixtures">4. Tests &amp; Fixtures</h2>
+<p>Tests &amp; Fixtures groups implementation around vault, setup, mock, secretssh, mostly in scripts/setup-vault-mock-secrets.sh, tests/pom.xml. This section covers 5 nodes and 3 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tests &amp; Fixtures (5 nodes, 3 edges)
+    subgraph tests_fixtures_scripts_setup_vault_mock_secrets_15d884d4["scripts/setup-vault-mock-secrets.sh"]
+        scripts_setup_vault_mock_secrets_ad6bdfec("setup-vault-mock-secrets.sh")
+        scripts_setup_vault_mock_secrets_vault_addr_ff76fed8("VAULT_ADDR<br/><small>scripts/setup-vault-mock-secrets.sh</small>")
+        scripts_setup_vault_mock_secrets_vault_token_8e9ab118("VAULT_TOKEN<br/><small>scripts/setup-vault-mock-secrets.sh</small>")
+        scripts_setup_vault_mock_secrets_sh_entry_211abf4d("setup-vault-mock-secrets.sh script<br/><small>scripts/setup-vault-mock-secrets.sh</small>")
+    end
+    pkg_tests_67a348fa("tests<br/><small>tests/pom.xml</small>")
+    scripts_setup_vault_mock_secrets_ad6bdfec -->|defines| scripts_setup_vault_mock_secrets_vault_addr_ff76fed8
+    scripts_setup_vault_mock_secrets_ad6bdfec -->|defines| scripts_setup_vault_mock_secrets_vault_token_8e9ab118
+    scripts_setup_vault_mock_secrets_ad6bdfec -->|contains| scripts_setup_vault_mock_secrets_sh_entry_211abf4d
+    class scripts_setup_vault_mock_secrets_ad6bdfec function;
+    class scripts_setup_vault_mock_secrets_vault_addr_ff76fed8 klass;
+    class scripts_setup_vault_mock_secrets_vault_token_8e9ab118 klass;
+    class scripts_setup_vault_mock_secrets_sh_entry_211abf4d function;
+    class pkg_tests_67a348fa module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>setup-vault-mock-secrets.sh</code><br><small style="color:var(--muted)">scripts/setup-vault-mock-secrets.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>setup-vault-mock-secrets.sh node in scripts/setup-vault-mock-secrets.sh.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>setup-vault-mock-secrets.sh script</code><br><small style="color:var(--muted)">scripts/setup-vault-mock-secrets.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>setup-vault-mock-secrets.sh script node in scripts/setup-vault-mock-secrets.sh.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>VAULT_ADDR</code><br><small style="color:var(--muted)">scripts/setup-vault-mock-secrets.sh</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>VAULT_ADDR node in scripts/setup-vault-mock-secrets.sh.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>VAULT_TOKEN</code><br><small style="color:var(--muted)">scripts/setup-vault-mock-secrets.sh</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>VAULT_TOKEN node in scripts/setup-vault-mock-secrets.sh.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>tests</code><br><small style="color:var(--muted)">tests/pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>scripts/setup-vault-mock-secrets.sh</code></td><td>4 nodes</td></tr>
+<tr><td><code>tests/pom.xml</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: defines x2, contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. Convergelua Aegisgate Orchestrator ====== -->
+<h2 id="convergelua-aegisgate-orchestrator">5. Convergelua Aegisgate Orchestrator</h2>
+<p>Convergelua Aegisgate Orchestrator groups implementation around convergelua, aegisgate, orchestrator, resources, mostly in resources/scripts/converge.lua. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Convergelua Aegisgate Orchestrator (1 nodes, 0 edges)
+    aegisgate_orchestrator_src_main_resources_script_2326ae5f("converge.lua")
+    class aegisgate_orchestrator_src_main_resources_script_2326ae5f function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>converge.lua</code><br><small style="color:var(--muted)">resources/scripts/converge.lua</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>converge.lua node in resources/scripts/converge.lua.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>resources/scripts/converge.lua</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Viteconfigts Aegisgate Sandbox ====== -->
+<h2 id="viteconfigts-aegisgate-sandbox">6. Viteconfigts Aegisgate Sandbox</h2>
+<p>Viteconfigts Aegisgate Sandbox groups implementation around viteconfigts, aegisgate, sandbox, mostly in aegisgate-sandbox-ui/vite.config.ts. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Viteconfigts Aegisgate Sandbox (1 nodes, 0 edges)
+    aegisgate_sandbox_ui_vite_config_0c0a150a("vite.config.ts")
+    class aegisgate_sandbox_ui_vite_config_0c0a150a module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>vite.config.ts</code><br><small style="color:var(--muted)">aegisgate-sandbox-ui/vite.config.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in aegisgate-sandbox-ui/vite.config.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate-sandbox-ui/vite.config.ts</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Aegisgate Common Pomxml ====== -->
+<h2 id="aegisgate-common-pomxml">7. Aegisgate Common Pomxml</h2>
+<p>Aegisgate Common Pomxml groups implementation around aegisgate, common, pomxml, mostly in aegisgate-common/pom.xml. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Aegisgate Common Pomxml (1 nodes, 0 edges)
+    pkg_aegisgate_common_e03dbd89("aegisgate-common<br/><small>aegisgate-common/pom.xml</small>")
+    class pkg_aegisgate_common_e03dbd89 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>aegisgate-common</code><br><small style="color:var(--muted)">aegisgate-common/pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>aegisgate-common node in aegisgate-common/pom.xml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate-common/pom.xml</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Aegisgate Ingress Pomxml ====== -->
+<h2 id="aegisgate-ingress-pomxml">8. Aegisgate Ingress Pomxml</h2>
+<p>Aegisgate Ingress Pomxml groups implementation around aegisgate, ingress, pomxml, mostly in aegisgate-ingress/pom.xml. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Aegisgate Ingress Pomxml (1 nodes, 0 edges)
+    pkg_aegisgate_ingress_94397f8c("aegisgate-ingress<br/><small>aegisgate-ingress/pom.xml</small>")
+    class pkg_aegisgate_ingress_94397f8c module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>aegisgate-ingress</code><br><small style="color:var(--muted)">aegisgate-ingress/pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>aegisgate-ingress node in aegisgate-ingress/pom.xml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate-ingress/pom.xml</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Aegisgate Orchestrator Pomxml ====== -->
+<h2 id="aegisgate-orchestrator-pomxml">9. Aegisgate Orchestrator Pomxml</h2>
+<p>Aegisgate Orchestrator Pomxml groups implementation around aegisgate, orchestrator, pomxml, mostly in aegisgate-orchestrator/pom.xml. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Aegisgate Orchestrator Pomxml (1 nodes, 0 edges)
+    pkg_aegisgate_orchestrator_2ca8e6ac("aegisgate-orchestrator<br/><small>aegisgate-orchestrator/pom.xml</small>")
+    class pkg_aegisgate_orchestrator_2ca8e6ac module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>aegisgate-orchestrator</code><br><small style="color:var(--muted)">aegisgate-orchestrator/pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>aegisgate-orchestrator node in aegisgate-orchestrator/pom.xml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aegisgate-orchestrator/pom.xml</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 10. Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml ====== -->
+<h2 id="comzyrconpayaegisgatezyrconpay-aegisgate-pomxml">10. Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml</h2>
+<p>Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml groups implementation around comzyrconpayaegisgatezyrconpay, aegisgate, pomxml, mostly in pom.xml. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Comzyrconpayaegisgatezyrconpay Aegisgate Pomxml (1 nodes, 0 edges)
+    pkg_com_zyrconpay_aegisgate_zyrconpay_aegisgate_40ec356f("com.zyrconpay.aegisgate:zyrconpay-aegis...<br/><small>pom.xml</small>")
+    class pkg_com_zyrconpay_aegisgate_zyrconpay_aegisgate_40ec356f module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>com.zyrconpay.aegisgate:zyrconpay-aegisgate</code><br><small style="color:var(--muted)">pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>com.zyrconpay.aegisgate:zyrconpay-aegisgate node in pom.xml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>pom.xml</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>260</td></tr>
+      <tr><td>Edges</td><td>455</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>20</td></tr>
+      <tr><td>Documented Sections</td><td>9</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>434</td></tr>
+      <tr><td>INFERRED</td><td>21</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>zyrconpay-aegisgate — Architecture Documentation</p>
+  <p>Generated: 2026-10-05 19:39 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>

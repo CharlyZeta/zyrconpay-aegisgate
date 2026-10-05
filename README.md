@@ -24,6 +24,7 @@ Para consultar la documentación técnica exhaustiva de grado de producción, ac
 * 📐 **[Manual de Arquitectura y Diseño Distribuido (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md)**: Justificación profunda de Java 21 Virtual Threads, WebFlux Ingress, Apache Kafka KRaft, Redis Cluster Hashtags, Caffeine Cache y diagramas Mermaid completos.
 * 🛡️ **[Modelo de Amenazas y Seguridad (`docs/SECURITY_AND_THREAT_MODEL.md`)](docs/SECURITY_AND_THREAT_MODEL.md)**: Análisis STRIDE / OWASP, mitigación atómica de bypass con dual tokens, HMAC-SHA256 constant-time, integración con HashiCorp Vault, alcance PCI-DSS y pruebas ArchUnit.
 * 🔌 **[Guía de Integración API Paso a Paso (`docs/API_INTEGRATION_GUIDE.md`)](docs/API_INTEGRATION_GUIDE.md)**: Especificaciones OpenAPI de endpoints, peticiones `curl`, streaming SSE real-time, cálculo de firmas HMAC (Node.js, Python, Java, React) y matriz de códigos HTTP.
+* 🕸️ **[Grafo de Conocimiento e Interactivo Graphify (`graphify-out/`)](graphify-out/)**: Visualizador interactivo de llamadas ([`zyrconpay-aegisgate-callflow.html`](graphify-out/zyrconpay-aegisgate-callflow.html)), árbol D3 colapsable ([`GRAPH_TREE.html`](graphify-out/GRAPH_TREE.html)) y grafo GraphRAG JSON (`graph.json`, 260 nodos, 455 aristas).
 
 ---
 

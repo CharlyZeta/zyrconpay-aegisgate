@@ -1,0 +1,439 @@
+{
+  "communities": {
+    "0": [
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice_verifyauthorization",
+      "com_tngtech_archunit_core_domain_javaclasses",
+      "org_junit_jupiter_api_test",
+      "org_springframework_boot_test_context_springboottest",
+      "org_springframework_boot_test_web_client_testresttemplate",
+      "org_springframework_test_context_dynamicpropertyregistry",
+      "org_springframework_test_context_dynamicpropertysource",
+      "org_testcontainers_containers_genericcontainer",
+      "org_testcontainers_containers_kafkacontainer",
+      "org_testcontainers_junit_jupiter_testcontainers",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest_us1_transactionflowtest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest_us1_transactionflowtest_computesignature",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest_us1_transactionflowtest_configureproperties",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest_us1_transactionflowtest_testhappypath_intentthenwebhook",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us1_transactionflowtest_us1_transactionflowtest_testracecondition_webhookarrivesbeforeintent",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest_us2_multitenantsupporttest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest_us2_multitenantsupporttest_computesignature",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest_us2_multitenantsupporttest_configureproperties",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest_us2_multitenantsupporttest_testmissingorunrecognizedmerchantheader_shouldreject",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us2_multitenantsupporttest_us2_multitenantsupporttest_testvalidmerchantrequest_retrievescorrectkeyfromvault",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_computesignature",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_configureproperties",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_testdirectauthorizationbypass_shouldthrowsecuritybypassexception",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_testverifyauthorization_withmissingtokens_shouldthrowsecuritybypassexception",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_testverifyauthorization_withvalidtokens_shouldsucceedandconsumekey",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest_testwebhooksignaturetampered_shouldreturn401",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest_configureproperties",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest_testrediskeysusehashtags",
+      "tests_src_test_java_com_zyrconpay_aegisgate_structural_aegisgateboundarytest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_structural_aegisgateboundarytest_aegisgateboundarytest",
+      "tests_src_test_java_com_zyrconpay_aegisgate_structural_aegisgateboundarytest_aegisgateboundarytest_testdirectpaymentisolation",
+      "tests_src_test_java_com_zyrconpay_aegisgate_structural_aegisgateboundarytest_aegisgateboundarytest_testingressdatabaseisolation",
+      "tests_src_test_java_com_zyrconpay_aegisgate_structural_aegisgateboundarytest_aegisgateboundarytest_testmoduleboundaries"
+    ],
+    "1": [
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_eventpublisher",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_eventpublisher_eventpublisher",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_eventpublisher_eventpublisher_publish",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_java_crossorigin",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_java_postmapping",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_java_requestmapping",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_java_restcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_paymentintentcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_paymentintentcontroller_paymentintentcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_paymentintentcontroller_registerintent",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_paymentintentcontroller_paymentintentrequest",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_java_crossorigin",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_java_postmapping",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_java_requestmapping",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_java_restcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_verificationdetails",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_webhookcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_webhookcontroller_handlewebhook",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_webhookcontroller_webhookcontroller",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_webhookrequest",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_service_signaturevalidationservice",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_service_signaturevalidationservice_signaturevalidationservice",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_service_signaturevalidationservice_signaturevalidationservice_validatesignature",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_java_postmapping",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller_authorize",
+      "com_fasterxml_jackson_databind_objectmapper",
+      "io_swagger_v3_oas_annotations_responses_apiresponses",
+      "io_swagger_v3_oas_annotations_tags_tag",
+      "org_springframework_http_responseentity",
+      "reactor_core_publisher_mono"
+    ],
+    "2": [
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_verificationeventset",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_verificationeventset_verificationeventset",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_verificationeventset_verificationeventset_isconverged",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_consumer_transactioneventconsumer_transactioneventconsumer_transactioneventconsumer",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_java_crossorigin",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_java_requestmapping",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_java_restcontroller",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller_getstatus",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller_getstatusstream",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller_transactionquerycontroller",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice_addtoken",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice_getstate",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice_redisstateservice",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_transactionstateregistry",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_transactionstateregistry_transactionstateregistry",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_transactionstateregistry_transactionstateregistry_emit",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_transactionstateregistry_transactionstateregistry_getstream",
+      "getmapping",
+      "io_swagger_v3_oas_annotations_operation",
+      "many",
+      "org_springframework_data_redis_core_script_redisscript",
+      "org_springframework_data_redis_core_stringredistemplate",
+      "org_springframework_http_codec_serversentevent",
+      "org_springframework_stereotype_service",
+      "reactor_core_publisher_flux",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest_testssestateregistryemission"
+    ],
+    "3": [
+      "aegisgate_sandbox_ui_package",
+      "aegisgate_sandbox_ui_package_dependencies",
+      "aegisgate_sandbox_ui_package_dependencies_lucide_react",
+      "aegisgate_sandbox_ui_package_dependencies_react",
+      "aegisgate_sandbox_ui_package_dependencies_react_dom",
+      "aegisgate_sandbox_ui_package_devdependencies",
+      "aegisgate_sandbox_ui_package_devdependencies_oxlint",
+      "aegisgate_sandbox_ui_package_devdependencies_types_node",
+      "aegisgate_sandbox_ui_package_devdependencies_types_react",
+      "aegisgate_sandbox_ui_package_devdependencies_types_react_dom",
+      "aegisgate_sandbox_ui_package_devdependencies_vite",
+      "aegisgate_sandbox_ui_package_devdependencies_vitejs_plugin_react",
+      "aegisgate_sandbox_ui_package_name",
+      "aegisgate_sandbox_ui_package_private",
+      "aegisgate_sandbox_ui_package_scripts",
+      "aegisgate_sandbox_ui_package_scripts_build",
+      "aegisgate_sandbox_ui_package_scripts_dev",
+      "aegisgate_sandbox_ui_package_scripts_lint",
+      "aegisgate_sandbox_ui_package_scripts_preview",
+      "aegisgate_sandbox_ui_package_type",
+      "aegisgate_sandbox_ui_package_version",
+      "lucide_react",
+      "oxlint",
+      "react",
+      "react_dom",
+      "types_node",
+      "types_react",
+      "types_react_dom",
+      "vite",
+      "vitejs_plugin_react"
+    ],
+    "4": [
+      "aegisgate_sandbox_ui_tsconfig_app",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_allowimportingtsextensions",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_erasablesyntaxonly",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_jsx",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_lib",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_module",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_moduledetection",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_moduleresolution",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_noemit",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_nofallthroughcasesinswitch",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_nounusedlocals",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_nounusedparameters",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_skiplibcheck",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_target",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_tsbuildinfofile",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_types",
+      "aegisgate_sandbox_ui_tsconfig_app_compileroptions_verbatimmodulesyntax",
+      "aegisgate_sandbox_ui_tsconfig_app_include",
+      "aegisgate_sandbox_ui_tsconfig_app_json_ref_es2023",
+      "ref_dom",
+      "ref_src",
+      "ref_vite_client"
+    ],
+    "5": [
+      "aegisgate_sandbox_ui_tsconfig_node",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_allowimportingtsextensions",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_erasablesyntaxonly",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_lib",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_module",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_moduledetection",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_noemit",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_nofallthroughcasesinswitch",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_nounusedlocals",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_nounusedparameters",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_skiplibcheck",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_target",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_tsbuildinfofile",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_types",
+      "aegisgate_sandbox_ui_tsconfig_node_compileroptions_verbatimmodulesyntax",
+      "aegisgate_sandbox_ui_tsconfig_node_include",
+      "aegisgate_sandbox_ui_tsconfig_node_json_ref_es2023",
+      "ref_node",
+      "ref_vite_config_ts"
+    ],
+    "6": [
+      "aegisgate_sandbox_ui_oxlintrc",
+      "aegisgate_sandbox_ui_oxlintrc_plugins",
+      "aegisgate_sandbox_ui_oxlintrc_rules",
+      "aegisgate_sandbox_ui_oxlintrc_rules_react_only_export_components",
+      "aegisgate_sandbox_ui_oxlintrc_rules_react_rules_of_hooks",
+      "aegisgate_sandbox_ui_oxlintrc_schema",
+      "aegisgate_sandbox_ui_package_devdependencies_typescript",
+      "aegisgate_sandbox_ui_src_app",
+      "aegisgate_sandbox_ui_src_app_app",
+      "aegisgate_sandbox_ui_src_app_calculatehmacsha256",
+      "aegisgate_sandbox_ui_src_app_config",
+      "aegisgate_sandbox_ui_src_app_logline",
+      "aegisgate_sandbox_ui_src_app_txstatus",
+      "aegisgate_sandbox_ui_src_app_uuidv4",
+      "aegisgate_sandbox_ui_src_main",
+      "ref_oxc",
+      "ref_react",
+      "ref_warn",
+      "typescript"
+    ],
+    "7": [
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_paymentevents",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_paymentevents_paymentevents",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_paymentevents_paymentevents_paymentevents",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_paymentevents_paymentintentevent",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_paymentevents_webhookreceivedevent",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_kafkaeventpublisher",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_kafkaeventpublisher_kafkaeventpublisher",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_kafkaeventpublisher_kafkaeventpublisher_kafkaeventpublisher",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_event_kafkaeventpublisher_kafkaeventpublisher_publish",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_consumer_transactioneventconsumer",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_consumer_transactioneventconsumer_transactioneventconsumer",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_consumer_transactioneventconsumer_transactioneventconsumer_consumeintent",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_consumer_transactioneventconsumer_transactioneventconsumer_consumewebhook",
+      "org_slf4j_logger",
+      "org_springframework_kafka_annotation_kafkalistener",
+      "org_springframework_kafka_core_kafkatemplate",
+      "org_springframework_stereotype_component",
+      "override"
+    ],
+    "8": [
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache_merchantprofilecache",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache_merchantprofilecache_getcredentials",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache_merchantprofilecache_invalidate",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache_merchantprofilecache_merchantprofilecache",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_service_vaultmerchantcredentialservice",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_service_vaultmerchantcredentialservice_vaultmerchantcredentialservice",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_service_vaultmerchantcredentialservice_vaultmerchantcredentialservice_getmerchantcredentials",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_service_vaultmerchantcredentialservice_vaultmerchantcredentialservice_getmockcredentials",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_service_vaultmerchantcredentialservice_vaultmerchantcredentialservice_vaultmerchantcredentialservice",
+      "com_github_benmanes_caffeine_cache_loadingcache",
+      "org_springframework_core_env_environment",
+      "org_springframework_vault_core_vaulttemplate",
+      "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest_testcaffeinecacheloading"
+    ],
+    "9": [
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_aegisgateingressapplication",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_aegisgateingressapplication_aegisgateingressapplication",
+      "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_aegisgateingressapplication_aegisgateingressapplication_main",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_aegisgateorchestratorapplication",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_aegisgateorchestratorapplication_aegisgateorchestratorapplication",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_aegisgateorchestratorapplication_aegisgateorchestratorapplication_main",
+      "org_springframework_boot_autoconfigure_springbootapplication",
+      "org_springframework_context_annotation_componentscan",
+      "tests_src_test_java_com_zyrconpay_aegisgate_testapplication",
+      "tests_src_test_java_com_zyrconpay_aegisgate_testapplication_testapplication",
+      "tests_src_test_java_com_zyrconpay_aegisgate_testapplication_testapplication_main"
+    ],
+    "10": [
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_aegisgateexception",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_aegisgateexception_aegisgateexception",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_aegisgateexception_aegisgateexception_aegisgateexception",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_aegisgateexception_aegisgateexception_geterrorcode",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_aegisgateexception_aegisgateexception_getstatus",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_securitybypassexception",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_securitybypassexception_securitybypassexception",
+      "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_exception_securitybypassexception_securitybypassexception_securitybypassexception",
+      "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller_handleaegisgateexception",
+      "exceptionhandler"
+    ],
+    "11": [
+      "scripts_setup_vault_mock_secrets",
+      "scripts_setup_vault_mock_secrets_sh__entry",
+      "scripts_setup_vault_mock_secrets_vault_addr",
+      "scripts_setup_vault_mock_secrets_vault_token"
+    ],
+    "12": [
+      "aegisgate_sandbox_ui_tsconfig",
+      "aegisgate_sandbox_ui_tsconfig_files",
+      "aegisgate_sandbox_ui_tsconfig_references"
+    ],
+    "13": [
+      "aegisgate_orchestrator_src_main_resources_scripts_converge"
+    ],
+    "14": [
+      "aegisgate_sandbox_ui_vite_config"
+    ],
+    "15": [
+      "pkg_aegisgate_common"
+    ],
+    "16": [
+      "pkg_aegisgate_ingress"
+    ],
+    "17": [
+      "pkg_aegisgate_orchestrator"
+    ],
+    "18": [
+      "pkg_com_zyrconpay_aegisgate_zyrconpay_aegisgate"
+    ],
+    "19": [
+      "pkg_tests"
+    ]
+  },
+  "cohesion": {
+    "0": 0.13900134952766532,
+    "1": 0.11491935483870967,
+    "2": 0.1425287356321839,
+    "3": 0.06666666666666667,
+    "4": 0.08695652173913043,
+    "5": 0.1,
+    "6": 0.1286549707602339,
+    "7": 0.1895424836601307,
+    "8": 0.23076923076923078,
+    "9": 0.2909090909090909,
+    "10": 0.24444444444444444,
+    "11": 0.5,
+    "12": 0.6666666666666666,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0
+  },
+  "gods": [
+    {
+      "id": "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_redisstateservice_redisstateservice",
+      "label": "RedisStateService",
+      "degree": 18
+    },
+    {
+      "id": "aegisgate_sandbox_ui_tsconfig_app_compileroptions",
+      "label": "compilerOptions",
+      "degree": 17
+    },
+    {
+      "id": "aegisgate_sandbox_ui_tsconfig_node_compileroptions",
+      "label": "compilerOptions",
+      "degree": 15
+    },
+    {
+      "id": "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_dto_verificationeventset_verificationeventset",
+      "label": "VerificationEventSet",
+      "degree": 13
+    },
+    {
+      "id": "aegisgate_ingress_src_main_java_com_zyrconpay_aegisgate_ingress_controller_webhookcontroller_webhookcontroller",
+      "label": "WebhookController",
+      "degree": 13
+    },
+    {
+      "id": "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_service_transactionstateregistry_transactionstateregistry",
+      "label": "TransactionStateRegistry",
+      "degree": 13
+    },
+    {
+      "id": "tests_src_test_java_com_zyrconpay_aegisgate_integration_us3_bypasspreventiontest_us3_bypasspreventiontest",
+      "label": "US3_BypassPreventionTest",
+      "degree": 13
+    },
+    {
+      "id": "tests_src_test_java_com_zyrconpay_aegisgate_integration_us4_performanceimprovementstest_us4_performanceimprovementstest",
+      "label": "US4_PerformanceImprovementsTest",
+      "degree": 13
+    },
+    {
+      "id": "aegisgate_common_src_main_java_com_zyrconpay_aegisgate_common_cache_merchantprofilecache_merchantprofilecache",
+      "label": "MerchantProfileCache",
+      "degree": 12
+    },
+    {
+      "id": "aegisgate_orchestrator_src_main_java_com_zyrconpay_aegisgate_orchestrator_controller_transactionquerycontroller_transactionquerycontroller",
+      "label": "TransactionQueryController",
+      "degree": 12
+    }
+  ],
+  "surprises": [
+    {
+      "source": "WebhookController",
+      "target": "MerchantProfileCache",
+      "source_files": [
+        "aegisgate-ingress/src/main/java/com/zyrconpay/aegisgate/ingress/controller/WebhookController.java",
+        "aegisgate-common/src/main/java/com/zyrconpay/aegisgate/common/cache/MerchantProfileCache.java"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "US4_PerformanceImprovementsTest",
+      "target": "MerchantProfileCache",
+      "source_files": [
+        "tests/src/test/java/com/zyrconpay/aegisgate/integration/US4_PerformanceImprovementsTest.java",
+        "aegisgate-common/src/main/java/com/zyrconpay/aegisgate/common/cache/MerchantProfileCache.java"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "US3_BypassPreventionTest",
+      "target": "RedisStateService",
+      "source_files": [
+        "tests/src/test/java/com/zyrconpay/aegisgate/integration/US3_BypassPreventionTest.java",
+        "aegisgate-orchestrator/src/main/java/com/zyrconpay/aegisgate/orchestrator/service/RedisStateService.java"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "US4_PerformanceImprovementsTest",
+      "target": "RedisStateService",
+      "source_files": [
+        "tests/src/test/java/com/zyrconpay/aegisgate/integration/US4_PerformanceImprovementsTest.java",
+        "aegisgate-orchestrator/src/main/java/com/zyrconpay/aegisgate/orchestrator/service/RedisStateService.java"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "US4_PerformanceImprovementsTest",
+      "target": "TransactionStateRegistry",
+      "source_files": [
+        "tests/src/test/java/com/zyrconpay/aegisgate/integration/US4_PerformanceImprovementsTest.java",
+        "aegisgate-orchestrator/src/main/java/com/zyrconpay/aegisgate/orchestrator/service/TransactionStateRegistry.java"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
