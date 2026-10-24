@@ -15,7 +15,8 @@ spring:
     vault:
       enabled: true
       uri: http://localhost:8200
-      token: myroot
+      # Dev-only root token. Override with VAULT_TOKEN in every other environment.
+      token: ${VAULT_TOKEN:dev-root-token-change-me}
       scheme: http
       kv:
         enabled: true

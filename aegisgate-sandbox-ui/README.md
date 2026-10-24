@@ -111,11 +111,11 @@ docker compose up -d
 ### Paso 2: Sembrar Secretos en Vault
 Inicializa los secretos criptográficos para los comercios de prueba dentro del almacén seguro:
 ```bash
-docker exec -e VAULT_ADDR="http://127.0.0.1:8200" -e VAULT_TOKEN="myroot" aegisgate-vault \
+docker exec -e VAULT_ADDR="http://127.0.0.1:8200" -e VAULT_TOKEN="${VAULT_TOKEN:-dev-root-token-change-me}" aegisgate-vault \
   vault secrets enable -path=secret kv-v2;
 
 # Sembrar credenciales por defecto para merchant default-merchant
-docker exec -e VAULT_ADDR="http://127.0.0.1:8200" -e VAULT_TOKEN="myroot" aegisgate-vault \
+docker exec -e VAULT_ADDR="http://127.0.0.1:8200" -e VAULT_TOKEN="${VAULT_TOKEN:-dev-root-token-change-me}" aegisgate-vault \
   vault kv put secret/merchants/default-merchant \
   signingKey="test-secret-key-123" \
   apiKey="default-api-key-111"

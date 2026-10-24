@@ -37,7 +37,9 @@ services:
     ports:
       - "8200:8200"
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "myroot"
+      # Must match the fallback in the Spring services and .env.example.
+      # Override with VAULT_TOKEN (shell export or docker/.env) outside local dev.
+      VAULT_DEV_ROOT_TOKEN_ID: "${VAULT_TOKEN:-dev-root-token-change-me}"
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
     cap_add:
       - IPC_LOCK

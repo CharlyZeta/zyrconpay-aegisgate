@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Configuration
-export VAULT_ADDR='http://localhost:8200'
-export VAULT_TOKEN='myroot'
+export VAULT_ADDR="${VAULT_ADDR:-http://localhost:8200}"
+# Same fallback as docker/docker-compose.yml and the Spring services.
+export VAULT_TOKEN="${VAULT_TOKEN:-dev-root-token-change-me}"
 
 echo "Initializing HashiCorp Vault secrets for AegisGate dynamic multi-tenancy..."
 

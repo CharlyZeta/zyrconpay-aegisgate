@@ -14,3 +14,8 @@ tmp/
 .docker-java.properties
 .DS_Store
 Thumbs.db
+
+# Local environment (never commit real credentials)
+.env
+.env.local
+.env.*.local
